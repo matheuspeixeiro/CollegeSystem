@@ -24,7 +24,6 @@ Sair			*/
 #include <unistd.h>
 #include <string.h>
 
-// talvez
 typedef struct tempUsers{
 	int id;
 	char name[31];
