@@ -55,7 +55,11 @@ typedef struct tempDiscipline{
 // variaveis globais
 int typeUser;
 
-int sequenceId(){
+int sequenceId(char* filename){
+    char file[31];
+    const char* ext = ".txt";
+    strcat(strcpy(file, filename), ext);
+
 	//variavel local
 	int seq;
 
@@ -63,12 +67,12 @@ int sequenceId(){
 	FILE* pFile;
 
 	// primeira vez - inicialização da sequência [verifica SE NÃO ja esta aberto]
-	if ((pFile=fopen("sequenceUser.txt", "rb"))==NULL){
+	if ((pFile=fopen(file, "rb"))==NULL){
 		// inicializa como 1
 		seq = 1;
 
 		//abrir o arquivo no modo escrita para armazenar o valor inicial
-		pFile = fopen("sequenceUser.txt", "wb");
+		pFile = fopen(file, "wb");
 
 		// armazenar o valor inicial no arquivvo
 		fprintf(pFile, "%d ", seq);
@@ -86,49 +90,7 @@ int sequenceId(){
 		fclose(pFile);
 
 		//abrir o arquivo no modo escrita para armazenar o valor inicial
-		pFile = fopen("sequenceUser.txt", "wb");
-
-		// armazenar o valor inicial no arquivvo
-		fprintf(pFile, "%d ", seq);
-
-		// fechar o arquivo
-		fclose(pFile);
-	}
-	return seq;
-}
-
-int sequenceIdStudent(){
-	//variavel local
-	int seq;
-
-	//declaração do ponteiro para o arquivo
-	FILE* pFile;
-
-	// primeira vez - inicialização da sequência [verifica SE NÃO ja esta aberto]
-	if ((pFile=fopen("sequenceStudent.txt", "rb"))==NULL){
-		// inicializa como 1
-		seq = 1;
-
-		//abrir o arquivo no modo escrita para armazenar o valor inicial
-		pFile = fopen("sequenceStudent.txt", "wb");
-
-		// armazenar o valor inicial no arquivvo
-		fprintf(pFile, "%d ", seq);
-
-		// fechar o arquivo
-		fclose(pFile);
-	} else {	// se o arquivo ja está aberto (n vezes)
-		// encontrar o valor corrente da sequência
-		fscanf(pFile, "%d", &seq);
-
-		//incrementa 1
-		seq++;
-
-		// fechar o arquivo
-		fclose(pFile);
-
-		//abrir o arquivo no modo escrita para armazenar o valor inicial
-		pFile = fopen("sequenceStudent.txt", "wb");
+		pFile = fopen(file, "wb");
 
 		// armazenar o valor inicial no arquivvo
 		fprintf(pFile, "%d ", seq);
@@ -159,7 +121,7 @@ bool recordUser(int type){
 	} while(strlen(user.name) == 0);
 
 	// entrada do id
-	user.id = sequenceId();
+	user.id = sequenceId("sequenceUser");
 	printf("\nId = %d", user.id);
 	sleep(1);
 
@@ -186,7 +148,7 @@ bool recordStudent(){
 	if ((pFile = fopen("students.txt", "ab")) == NULL);
 	STUDENT student;
 
-	student.id = sequenceIdStudent();
+	student.id = sequenceId("sequenceStudent");
 
 	printf("Enter the name: ");
     fflush(stdin);
@@ -195,7 +157,6 @@ bool recordStudent(){
     printf("Enter the birthdate: ");
     fflush(stdin);
     gets(student.birthDate);
-
 
     /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"*/
     FILE* pCoursesFile;
@@ -217,6 +178,92 @@ bool recordStudent(){
 	fclose(pFile);
     return true;
 }
+/*
+int getWorkTime(FILE* pCourseFile, FILE* pDiscipineFile){
+    int WorkTime;
+    // pegar as strings de nomes, buscar no arquivo de disciplinas e somar WorkTime
+    while (fscanf(pCourseFile, "%i %*s %i %s\n", &typeUser, &targetId, targetPassword) != -1){
+		if (sourceId == targetId){
+
+    return WorkTime;
+    */
+
+bool recordCourse(){
+    // curso armazena-se o id, o nome e a carga horária e (discipinas listadas?).
+    system("cls");
+
+	FILE* pFile;
+	if ((pFile = fopen("courses.txt", "ab")) == NULL);
+	COURSE course;
+
+	course.id = sequenceId("sequenceCourse");
+	printf("Course Id: %d\n\n", course.id);
+
+	printf("Enter the course name: ");
+    fflush(stdin);
+    gets(course.name);
+
+    course.workTime = 0;
+    printf("Course worktime defined: 0\t(There's no disciplines still, it will be added after)\n\n");
+
+    // armazenar id, nome, timeWork
+	fprintf(pFile, "%i %s %i\n", course.id, course.name, course.workTime);
+	fclose(pFile);
+	return true;
+
+}
+
+
+/*
+bool recordDiscipline(){
+    system("cls");
+	FILE* pDisciplineFile;
+	if ((pDisciplineFile = fopen("disciplines.txt", "ab")) == NULL)
+        return false;
+	DISCIPLINE discipline;
+
+	discipline.id = sequenceId("sequenceDiscipline");
+	printf("Discipline ID: %i\n\n", discipline.id);
+
+	printf("Enter the discipline name: ");
+    fflush(stdin);
+    gets(discipline.name);
+
+    printf("\nEnter the worktime (hours): ");
+    scanf("%i", &discipline.workTime);
+
+    // entrada de dados - course_id
+    FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"
+    FILE* pCoursesFile;
+    bool courseExists=false;
+    int  courseId, courseWorkTime;
+    do{
+        printf("\nEnter the course Id: ");
+        //showCourses();
+        scanf("%d", &discipline.courseId);
+        pCoursesFile = fopen("courses.txt", "rb");
+        while (fscanf(pCoursesFile, "%i %*s %i", &courseId, &courseWorkTime) != -1){
+            if (courseId == discipline.courseId){
+                courseExists = true;
+            }
+        }
+        system("cls");
+    } while (courseExists == false);
+
+    //vai incrementando a carga horaria do curso.
+    fclose(pCoursesFile);
+    pCoursesFile = fopen("courses.txt", "ab");
+    int newWorkTime = courseWorkTime+=discipline.workTime;
+    fprintf(pCoursesFile, "%n %n %i", newWorkTime);
+    printf("\n\nINCREMENTADO -> %d\n\n", newWorkTime);
+    system("pause");
+    fclose(pCoursesFile);
+
+    // armazena no arquivo disciplines.txt
+    fprintf(pDisciplineFile, "%i %s %i\n", discipline.id, discipline.name, discipline.workTime);
+    fclose(pDisciplineFile);
+    fclose(pCoursesFile);
+}*/
 
 bool showStudent(){
     int id, courseId;
@@ -233,6 +280,9 @@ bool showStudent(){
 
 	fclose(pFile);
     return true;
+}
+
+bool showCourses(){
 }
 
 /*int id;
@@ -319,15 +369,30 @@ void adminMenu(){
     system("pause");
 }
 
-int main(){
-	// garantindo que haverá arquivo criado:
+void createFile(char* filename){
+    char file[31];
+    const char* ext = ".txt";
+    strcat(strcpy(file, filename), ext);
+    // garantindo que haverá arquivo criado:
 	// criando um arquivo txt com o nome de "users"
-	FILE* pFile = fopen("users.txt", "ab");
+	FILE* pFile = fopen(file, "ab");
 	fclose(pFile);
+}
+
+int main(){
+    /*Criando arquivos*/
+    createFile("users");
+    createFile("students");
+    createFile("courses");
+    createFile("disciplines");
+    //createFile("sequenceUser");
+    //createFile("sequenceStudent");
+    //createFile("sequenceCourse");
+    //createFile("sequenceDiscipline");
 
 	/* VER SE O ARQUIVO DE USUÁRIOS POSSUI CADASTROS */
 	// abre o arquivo que armazena os usuarios em modo leitura binaria
-	pFile = fopen("users.txt", "rb");
+	FILE* pFile = fopen("users.txt", "rb");
 
 	// por padrão, considera-se que nao ha administrador
 	bool hasAdm = false;
@@ -382,8 +447,7 @@ int main(){
         }
 	} while (!loginSuccess);
 
-    recordStudent();
-    showStudent();
+    recordCourse();
     exit(0);
 
     /* Menu de acordo com o tipo de usuario */
