@@ -1,2 +1,1 @@
-1 teste 0
-2 novocurso 0
+1 calc 0

@@ -1,4 +1,2 @@
 0 adm 1 senha1
-1 lucas 2 senha2_
-0 adm2 3 senha3_
-1 novo 3 senha3
+1 new 2 senha2_

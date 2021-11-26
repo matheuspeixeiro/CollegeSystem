@@ -1,6 +1,4 @@
-1 calculoII 50
-2 algebralinear 10
-3 ga 50
-4 nova 30
-5 teste 10
-7 fisicaII 30
+2 novo 10
+3 calculoII 20
+4 teste 5
+5 novanova 5
