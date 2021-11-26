@@ -490,9 +490,9 @@ void adminMenu(){
                 // se nao tiver curso cadastrado, nao permite cadastrar disciplina
                 if (hasCourse()){
                     if(!showDisciplines())
-                        printf("Couldn't show the disciplines, because there's no courses..\n\n");
+                        printf("Couldn't show the disciplines, try again..\n\n");
                 } else {
-                    printf("Couldn't show the disciplines, becas..\n\n");
+                    printf("Couldn't show the disciplines, because there's no courses..\n\n");
                 }
                 system("pause");
                 break;
@@ -603,7 +603,6 @@ int main(){
         adminMenu();
     else
         commonMenu();
-
 
     system("pause");
 
