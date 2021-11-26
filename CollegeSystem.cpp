@@ -537,10 +537,6 @@ int main(){
     createFile("students");
     createFile("courses");
     createFile("disciplines");
-    //createFile("sequenceUser");
-    //createFile("sequenceStudent");
-    //createFile("sequenceCourse");
-    //createFile("sequenceDiscipline");
 
 	/* VER SE O ARQUIVO DE USUÁRIOS POSSUI CADASTROS */
 	// abre o arquivo que armazena os usuarios em modo leitura binaria
