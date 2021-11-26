@@ -1,2 +1,0 @@
-0 adm 1 senha1
-1 new 2 senha2_

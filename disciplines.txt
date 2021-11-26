@@ -1,4 +1,0 @@
-2 novo 10
-3 calculoII 20
-4 teste 5
-5 novanova 5

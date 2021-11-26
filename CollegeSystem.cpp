@@ -102,8 +102,6 @@ int sequenceId(char* filename){
 }
 
 bool recordUser(int type){
-	system("cls");
-
 	FILE* pFile;
 	if ((pFile = fopen("users.txt", "ab")) == NULL)
         return false;
@@ -135,7 +133,6 @@ bool recordUser(int type){
 		gets (user.password);
 	} while(strlen(user.password) == 0);
 
-
 	// armazenar type, nome, id, password
 	fprintf(pFile, "%i %s %i %s\n", user.type, user.name, user.id, user.password);
 	fclose(pFile);
@@ -156,39 +153,32 @@ bool recordStudent(){
     fflush(stdin);
     gets(student.name);
 
-    printf("Enter the birthdate: ");
+    printf("\nEnter the birthdate: ");
     fflush(stdin);
     gets(student.birthDate);
 
-    /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"*/
+    /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses" */
     FILE* pCoursesFile;
     bool courseExists=false;
-    int  courseId;
+    int  courseId, courseWorkTime;
     do{
-        printf("Enter the course Id: ");
-        pCoursesFile = fopen("courses.txt", "rb");
+        printf("\nEnter the course Id: ");
         scanf("%d", &student.courseId);
-        while (fscanf(pCoursesFile, "%i", &courseId) != -1){
-            if (courseId == student.courseId)
+        pCoursesFile = fopen("courses.txt", "rb");
+        char courseName[31];
+        while (fscanf(pCoursesFile, "%i %*s %*i", &courseId) != -1){
+            if (courseId == student.courseId){
                 courseExists = true;
+            }
         }
-        fclose(pCoursesFile);
         system("cls");
     } while (courseExists == false);
 
+    fclose(pCoursesFile);
 	fprintf(pFile, "%i %s %s %i\n", student.id, student.name, student.birthDate, student.courseId);
 	fclose(pFile);
     return true;
 }
-/*
-int getWorkTime(FILE* pCourseFile, FILE* pDiscipineFile){
-    int WorkTime;
-    // pegar as strings de nomes, buscar no arquivo de disciplinas e somar WorkTime
-    while (fscanf(pCourseFile, "%i %*s %i %s\n", &typeUser, &targetId, targetPassword) != -1){
-		if (sourceId == targetId){
-
-    return WorkTime;
-    */
 
 bool recordCourse(){
     // curso armazena-se o id, o nome e a carga horária e (discipinas listadas?).
@@ -206,15 +196,14 @@ bool recordCourse(){
     fflush(stdin);
     gets(course.name);
 
-    course.workTime = 0;
-    printf("Course worktime defined: 0\t(There's no disciplines still, it will be added after)\n\n");
+    printf("\nEnter the course worktime (hours): ");
+    scanf("%d", &course.workTime);
     system("pause");
 
     // armazenar id, nome, timeWork
 	fprintf(pFile, "%i %s %i\n", course.id, course.name, course.workTime);
 	fclose(pFile);
 	return true;
-
 }
 
 bool recordDiscipline(){
@@ -234,8 +223,7 @@ bool recordDiscipline(){
     printf("\nEnter the worktime (hours): ");
     scanf("%i", &discipline.workTime);
 
-    // entrada de dados - course_id
-    /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"*/
+    /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses" */
     FILE* pCoursesFile;
     bool courseExists=false;
     int  courseId, courseWorkTime;
@@ -244,7 +232,8 @@ bool recordDiscipline(){
         //showCourses();
         scanf("%d", &discipline.courseId);
         pCoursesFile = fopen("courses.txt", "rb");
-        while (fscanf(pCoursesFile, "%i %*s %i", &courseId, &courseWorkTime) != -1){
+        char courseName[31];
+        while (fscanf(pCoursesFile, "%i %s", &courseId, courseName) != -1){
             if (courseId == discipline.courseId){
                 courseExists = true;
             }
@@ -252,30 +241,23 @@ bool recordDiscipline(){
         system("cls");
     } while (courseExists == false);
 
-    /*vai incrementando a carga horaria do curso.
-    fclose(pCoursesFile);
-    pCoursesFile = fopen("courses.txt", "ab");
-    int newWorkTime = courseWorkTime+=discipline.workTime;
-    fprintf(pCoursesFile, "%i %s %i", 2, "calcNew", newWorkTime);
-    printf("\n\nINCREMENTADO -> %d\n\n", newWorkTime);
-    system("pause");
-    fclose(pCoursesFile);*/
-
     // armazena no arquivo disciplines.txt
-    fprintf(pDisciplineFile, "%i %s %i\n", discipline.id, discipline.name, discipline.workTime);
+    fprintf(pDisciplineFile, "%i %s %i %i\n", discipline.id, discipline.name, discipline.workTime, discipline.courseId);
     fclose(pDisciplineFile);
     fclose(pCoursesFile);
-
     return true;
 }
 
 bool showStudent(){
+    system("cls");
     int id, courseId;
     char name[31], birthDate[11];
 
     FILE* pFile;
 	if ((pFile = fopen("students.txt", "rb"))==NULL)
 		return false;
+
+    printf("| Id | Name | Birth Date | Course Id |\n\n");
 
 	while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
         printf("%i %s %s %i\n", id, name, birthDate, courseId);
@@ -294,6 +276,7 @@ bool showCourses(){
 	if ((pFile = fopen("courses.txt", "rb"))==NULL)
 		return false;
 
+    printf("| Id | Name | Worktime |\n\n");
 	while (fscanf(pFile, "%i %s %i\n", &id, name, &workTime) != -1){
         printf("%i %s %i\n", id, name, workTime);
 	}
@@ -310,10 +293,11 @@ bool showDisciplines(){
 	if ((pFile = fopen("disciplines.txt", "rb"))==NULL)
 		return false;
 
+    system("cls");
+    printf("| Id | Name | Worktime | Course Id |\n\n");
 	while (fscanf(pFile, "%i %s %i %i\n", &id, name, &workTime, &courseId) != -1){
         printf("%i %s %i %i\n", id, name, workTime, courseId);
 	}
-	system("pause");
 
 	fclose(pFile);
     return true;
@@ -321,14 +305,14 @@ bool showDisciplines(){
 
 bool login(){
 	// variaveis locais
-	int sourceId=NULL, targetId=NULL;
-	char sourcePassword[31], targetPassword[31];
+	char sourcePassword[31], targetPassword[31], sourceId[2], targetId[2];
 
 	/* entrada de username e senha */
 	do {
 		system("cls");
 		printf("Enter the id: ");
-		scanf("%d", &sourceId);
+		fflush(stdin);
+		gets(sourceId);
 	} while(sourceId == NULL);
 
 	do {
@@ -345,8 +329,8 @@ bool login(){
 
 	// obs.: %*i ou %*s , faz o programa ignorar a captura do dado
 
-	while (fscanf(pFile, "%i %*s %i %s\n", &typeUser, &targetId, targetPassword) != -1){
-		if (sourceId == targetId){
+	while (fscanf(pFile, "%i %*s %s %s\n", &typeUser, targetId, targetPassword) != -1){
+		if (strcmp(sourceId,targetId)== 0){
 			// achou o Id
 			printf("\nID encontrado!\n");
 
@@ -379,20 +363,26 @@ bool hasCourse(){
 }
 
 bool findStudentByKey(){
+    system("cls");
     printf("Enter de search key (student id): ");
     int searchId, id, courseId;
-    char name[31], birthDate[10];
+    char birthDate[10];
     scanf("%d", &searchId);
 
     FILE* pFile = fopen("students.txt", "rb");
 
+    bool flag;
+    char name[31];
     while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
         if (id == searchId){
-            printf("Student finded!\n\t%i %s %s %i\n\n", id, name, birthDate, courseId);
+            printf("\nStudent finded!\n\t%i %s %s %i\n\n", id, name, birthDate, courseId);
             system("pause");
-            return true;
+            flag = true;
         }
 	}
+	fclose(pFile);
+	if (flag)
+        return true;
 	return false;
 }
 
@@ -402,7 +392,7 @@ void commonMenu(){
         system("cls");
         printf("\nMenu - Common:\n\n");
         printf("Choose one option\n\t1-Record student\n\t2-Show students\n\t3-Find student by ID");
-        printf("\n\t4-Show disciplines\n\t5-Show courses\n\t9-Exit\n: ");
+        printf("\n\t4-Show disciplines\n\t5-Show courses\n\t9-Exit\n-> ");
         scanf("%i", &option);
 
         switch (option){
@@ -417,12 +407,17 @@ void commonMenu(){
                 }
                 break;
             case 2:
-                if(!showStudent())
+                if(!showStudent()){
                     printf("Couldn't show the students, try again..\n\n");
+                    system("pause");
+                }
                 break;
             case 3:
-                if(!findStudentByKey())
+                if(!findStudentByKey()){
                     printf("Couldn't find the student, try again..\n\n");
+                    system("pause");
+                }
+                break;
             case 4:
                 // se nao tiver curso cadastrado, nao permite cadastrar disciplina
                 if (hasCourse()){
@@ -434,13 +429,15 @@ void commonMenu(){
                 system("pause");
                 break;
             case 5:
-                if(!showCourses())
-                        printf("Couldn't show the courses, try again..\n\n");
+                if(!showCourses()){
+                    printf("Couldn't show the courses, try again..\n\n");
+                    system("pause");
+                }
                 break;
             case 9:
                 exit(0);
             default:
-                    printf("Invalid option, try again..\n\n");
+                printf("Invalid option, try again..\n\n");
         }
     } while (option != 9);
 }
@@ -457,6 +454,7 @@ void adminMenu(){
 
         switch (option) {
             case 1:
+                system("cls");
                 int type;
                 printf("Enter the user type <0 - admin | 1 - common>: ");
                 scanf("%d", &type);
@@ -486,6 +484,7 @@ void adminMenu(){
                 } else {
                     printf("Couldn't record a new discipline, because there's no courses..\n\n");
                 }
+                system("pause");
                 break;
             case 5:
                 // se nao tiver curso cadastrado, nao permite cadastrar disciplina
@@ -500,14 +499,17 @@ void adminMenu(){
             case 6:
                 if(!showCourses())
                     printf("Couldn't show the courses, try again..\n\n");
+                system("pause");
                 break;
             case 7:
                 if(!showStudent())
                     printf("Couldn't show the students, try again..\n\n");
+                system("pause");
                 break;
             case 8:
-                //if(!findStudentByKey())
-                  //  printf("Couldn't find the student, try again..\n\n");
+                if(!findStudentByKey())
+                    printf("Couldn't find the student, try again..\n\n");
+                system("pause");
                 break;
             case 9:
                 exit(0);
