@@ -55,9 +55,9 @@ typedef struct tempDiscipline{
 // variaveis globais
 int typeUser;
 
-int sequenceId(char* filename){
+int sequenceId(char filename[25]){
     char file[31];
-    const char* ext = ".txt";
+    char ext[5] = {".txt"};
     strcat(strcpy(file, filename), ext);
 
 	//variavel local
