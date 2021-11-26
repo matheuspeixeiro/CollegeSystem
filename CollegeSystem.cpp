@@ -587,6 +587,9 @@ int main(){
 
 			switch (option){
 				case 1:
+				    system("cls");
+                    printf("PLEASE, DON'T USE SPACES ON THE PROGRAM!\n\n");
+                    system("pause");
 					// chama login dentro de um if (bool -> portanto)
 					// se login é false (!), avise que deu erro de login
 					if(login()){
