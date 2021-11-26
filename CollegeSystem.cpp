@@ -105,7 +105,8 @@ bool recordUser(int type){
 	system("cls");
 
 	FILE* pFile;
-	if ((pFile = fopen("users.txt", "ab")) == NULL);
+	if ((pFile = fopen("users.txt", "ab")) == NULL)
+        return false;
 	USER user;
 
  	// entrada do type
@@ -145,7 +146,8 @@ bool recordStudent(){
     system("cls");
 
 	FILE* pFile;
-	if ((pFile = fopen("students.txt", "ab")) == NULL);
+	if ((pFile = fopen("students.txt", "ab")) == NULL)
+        return false;
 	STUDENT student;
 
 	student.id = sequenceId("sequenceStudent");
@@ -193,7 +195,8 @@ bool recordCourse(){
     system("cls");
 
 	FILE* pFile;
-	if ((pFile = fopen("courses.txt", "ab")) == NULL);
+	if ((pFile = fopen("courses.txt", "ab")) == NULL)
+        return false;
 	COURSE course;
 
 	course.id = sequenceId("sequenceCourse");
@@ -205,6 +208,7 @@ bool recordCourse(){
 
     course.workTime = 0;
     printf("Course worktime defined: 0\t(There's no disciplines still, it will be added after)\n\n");
+    system("pause");
 
     // armazenar id, nome, timeWork
 	fprintf(pFile, "%i %s %i\n", course.id, course.name, course.workTime);
@@ -213,8 +217,6 @@ bool recordCourse(){
 
 }
 
-
-/*
 bool recordDiscipline(){
     system("cls");
 	FILE* pDisciplineFile;
@@ -233,7 +235,7 @@ bool recordDiscipline(){
     scanf("%i", &discipline.workTime);
 
     // entrada de dados - course_id
-    FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"
+    /*FAZER VALIDACAO DE SE O CURSO EXISTE NO FILE "courses"*/
     FILE* pCoursesFile;
     bool courseExists=false;
     int  courseId, courseWorkTime;
@@ -250,20 +252,22 @@ bool recordDiscipline(){
         system("cls");
     } while (courseExists == false);
 
-    //vai incrementando a carga horaria do curso.
+    /*vai incrementando a carga horaria do curso.
     fclose(pCoursesFile);
     pCoursesFile = fopen("courses.txt", "ab");
     int newWorkTime = courseWorkTime+=discipline.workTime;
-    fprintf(pCoursesFile, "%n %n %i", newWorkTime);
+    fprintf(pCoursesFile, "%i %s %i", 2, "calcNew", newWorkTime);
     printf("\n\nINCREMENTADO -> %d\n\n", newWorkTime);
     system("pause");
-    fclose(pCoursesFile);
+    fclose(pCoursesFile);*/
 
     // armazena no arquivo disciplines.txt
     fprintf(pDisciplineFile, "%i %s %i\n", discipline.id, discipline.name, discipline.workTime);
     fclose(pDisciplineFile);
     fclose(pCoursesFile);
-}*/
+
+    return true;
+}
 
 bool showStudent(){
     int id, courseId;
@@ -283,12 +287,37 @@ bool showStudent(){
 }
 
 bool showCourses(){
+    system("cls");
+    int id, workTime;
+    char name[31];
+    FILE* pFile;
+	if ((pFile = fopen("courses.txt", "rb"))==NULL)
+		return false;
+
+	while (fscanf(pFile, "%i %s %i\n", &id, name, &workTime) != -1){
+        printf("%i %s %i\n", id, name, workTime);
+	}
+	system("pause");
+
+	fclose(pFile);
+    return true;
 }
 
-/*int id;
-	char name[31];
-	char birthDate;
-	int courseId;*/
+bool showDisciplines(){
+    int id, workTime, courseId;
+    char name[31];
+    FILE* pFile;
+	if ((pFile = fopen("disciplines.txt", "rb"))==NULL)
+		return false;
+
+	while (fscanf(pFile, "%i %s %i %i\n", &id, name, &workTime, &courseId) != -1){
+        printf("%i %s %i %i\n", id, name, workTime, courseId);
+	}
+	system("pause");
+
+	fclose(pFile);
+    return true;
+}
 
 bool login(){
 	// variaveis locais
@@ -314,9 +343,7 @@ bool login(){
 	if ((pFile = fopen("users.txt", "rb"))==NULL)
 		return false;
 
-	// fseek - se o Id for 10. pular (9?) structs de sizeof(USER) --------------------------------------
 	// obs.: %*i ou %*s , faz o programa ignorar a captura do dado
-	//bool loginFlag = false;
 
 	while (fscanf(pFile, "%i %*s %i %s\n", &typeUser, &targetId, targetPassword) != -1){
 		if (sourceId == targetId){
@@ -326,8 +353,7 @@ bool login(){
 			// se a senha for correta
 			if(strcmp(sourcePassword, targetPassword)==0){
 				printf("Senha encontrada!\n\n");
-				//loginFlag = true;
-				system("pause");
+                system("pause");
 				fclose(pFile);
 				return true;
 			}
@@ -336,36 +362,160 @@ bool login(){
 	return false;
 }
 
+bool hasCourse(){
+	FILE* pFile = fopen("courses.txt", "rb");
+	// por padrão, considera-se que nao ha administrador
+	char type;
+	// se o primeiro caracter do arquivo users.txt for 0, entao há adm e deve mandar para menu de escolha
+	while ((char(type = getc(pFile)))!=EOF){
+		if (type != NULL){
+			return true;
+		}
+		// break para pegar apenas o primeiro caracter
+		break;
+	}
+	fclose(pFile);
+    return false;
+}
+
+bool findStudentByKey(){
+    printf("Enter de search key (student id): ");
+    int searchId, id, courseId;
+    char name[31], birthDate[10];
+    scanf("%d", &searchId);
+
+    FILE* pFile = fopen("students.txt", "rb");
+
+    while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
+        if (id == searchId){
+            printf("Student finded!\n\t%i %s %s %i\n\n", id, name, birthDate, courseId);
+            system("pause");
+            return true;
+        }
+	}
+	return false;
+}
+
 void commonMenu(){
-    /*
     int option;
-    printf("\nMenu - Common:\n\n");
-    printf("Choose one option\n\t1-Record student\n\t2-Show students\n\t3-Find student by ID");
-    printf("\n\t4-Show disciplines\n\t5-Show courses\n\t9-Exit\n: ");
-    scanf("%i", &option);
+    do{
+        system("cls");
+        printf("\nMenu - Common:\n\n");
+        printf("Choose one option\n\t1-Record student\n\t2-Show students\n\t3-Find student by ID");
+        printf("\n\t4-Show disciplines\n\t5-Show courses\n\t9-Exit\n: ");
+        scanf("%i", &option);
 
-    switch (option){
-        case 1:
-
-
-    }
-
-
-    Cadastrar aluno
-
-    Listar aluno
-    Consultar aluno por código
-
-    Listar disciplina
-    Listar curso
-
-    Sair
-    */
-
+        switch (option){
+            case 1:
+                // se nao tiver curso cadastrado, nao permite cadastrar estudante
+                if (hasCourse()){
+                    if(!recordStudent())
+                        printf("Couldn't record a new student, try again..\n\n");
+                } else {
+                    printf("Couldn't record a new student, because there's no courses..\n\n");
+                    system("pause");
+                }
+                break;
+            case 2:
+                if(!showStudent())
+                    printf("Couldn't show the students, try again..\n\n");
+                break;
+            case 3:
+                if(!findStudentByKey())
+                    printf("Couldn't find the student, try again..\n\n");
+            case 4:
+                // se nao tiver curso cadastrado, nao permite cadastrar disciplina
+                if (hasCourse()){
+                    if(!showDisciplines())
+                        printf("Couldn't show the disciplines, because there's no courses..\n\n");
+                } else {
+                    printf("Couldn't show the disciplines, becas..\n\n");
+                }
+                system("pause");
+                break;
+            case 5:
+                if(!showCourses())
+                        printf("Couldn't show the courses, try again..\n\n");
+                break;
+            case 9:
+                exit(0);
+            default:
+                    printf("Invalid option, try again..\n\n");
+        }
+    } while (option != 9);
 }
 
 void adminMenu(){
-    printf("\n\nADM MENU\n\n");
+    int option;
+    do {
+        system("cls");
+        printf("\nMenu - Admin:\n\n");
+        printf("Choose one option:\n\n\t1-Record user\n\t2-Record student\n\t3-Record course");
+        printf("\n\t4-Record discipline\n\t5-Show disciplines\n\t6-Show courses\n\t7-Show students");
+        printf("\n\t8-Find student by ID\n\t9-Exit\n-> ");
+        scanf("%i", &option);
+
+        switch (option) {
+            case 1:
+                int type;
+                printf("Enter the user type <0 - admin | 1 - common>: ");
+                scanf("%d", &type);
+
+                if(!recordUser(type))
+                    printf("Couldn't record a new user, try again..\n\n");
+                break;
+            case 2:
+                // se nao tiver curso cadastrado, nao permite cadastrar estudante
+                if (hasCourse()){
+                    if(!recordStudent())
+                        printf("Couldn't record a new student, try again..\n\n");
+                } else {
+                    printf("Couldn't record a new student, because there's no courses..\n\n");
+                    system("pause");
+                }
+                system("pause");
+                break;
+            case 3:
+                if(!recordCourse())
+                    printf("Couldn't record a new course, try again..\n\n");
+                break;
+            case 4:
+                if (hasCourse()){
+                    if(!recordDiscipline())
+                        printf("Couldn't record a new discipline, try again..\n\n");
+                } else {
+                    printf("Couldn't record a new discipline, because there's no courses..\n\n");
+                }
+                break;
+            case 5:
+                // se nao tiver curso cadastrado, nao permite cadastrar disciplina
+                if (hasCourse()){
+                    if(!showDisciplines())
+                        printf("Couldn't show the disciplines, because there's no courses..\n\n");
+                } else {
+                    printf("Couldn't show the disciplines, becas..\n\n");
+                }
+                system("pause");
+                break;
+            case 6:
+                if(!showCourses())
+                    printf("Couldn't show the courses, try again..\n\n");
+                break;
+            case 7:
+                if(!showStudent())
+                    printf("Couldn't show the students, try again..\n\n");
+                break;
+            case 8:
+                //if(!findStudentByKey())
+                  //  printf("Couldn't find the student, try again..\n\n");
+                break;
+            case 9:
+                exit(0);
+            default:
+                printf("Invalid option, try again..\n\n");
+        }
+    } while (option != 9);
+
     system("pause");
 }
 
@@ -393,7 +543,6 @@ int main(){
 	/* VER SE O ARQUIVO DE USUÁRIOS POSSUI CADASTROS */
 	// abre o arquivo que armazena os usuarios em modo leitura binaria
 	FILE* pFile = fopen("users.txt", "rb");
-
 	// por padrão, considera-se que nao ha administrador
 	bool hasAdm = false;
 	char type;
@@ -446,9 +595,6 @@ int main(){
             hasAdm = true;
         }
 	} while (!loginSuccess);
-
-    recordCourse();
-    exit(0);
 
     /* Menu de acordo com o tipo de usuario */
     if (typeUser == 0)
