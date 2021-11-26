@@ -134,7 +134,7 @@ bool recordUser(int type){
 	} while(strlen(user.password) == 0);
 
 	// armazenar type, nome, id, password
-	fprintf(pFile, "%i %s %i %s\n", user.type, user.name, user.id, user.password);
+	fprintf(pFile, "%i#%s#%i#%s\n", user.type, user.name, user.id, user.password);
 	fclose(pFile);
 	return true;
 }
@@ -166,7 +166,7 @@ bool recordStudent(){
         scanf("%d", &student.courseId);
         pCoursesFile = fopen("courses.txt", "rb");
         char courseName[31];
-        while (fscanf(pCoursesFile, "%i %*s %*i", &courseId) != -1){
+        while (fscanf(pCoursesFile, "%i#%*s#%*i", &courseId) != -1){
             if (courseId == student.courseId){
                 courseExists = true;
             }
@@ -175,7 +175,7 @@ bool recordStudent(){
     } while (courseExists == false);
 
     fclose(pCoursesFile);
-	fprintf(pFile, "%i %s %s %i\n", student.id, student.name, student.birthDate, student.courseId);
+	fprintf(pFile, "%i#%s#%s#%i\n", student.id, student.name, student.birthDate, student.courseId);
 	fclose(pFile);
     return true;
 }
@@ -201,7 +201,7 @@ bool recordCourse(){
     system("pause");
 
     // armazenar id, nome, timeWork
-	fprintf(pFile, "%i %s %i\n", course.id, course.name, course.workTime);
+	fprintf(pFile, "%i#%s#%i\n", course.id, course.name, course.workTime);
 	fclose(pFile);
 	return true;
 }
@@ -232,8 +232,7 @@ bool recordDiscipline(){
         //showCourses();
         scanf("%d", &discipline.courseId);
         pCoursesFile = fopen("courses.txt", "rb");
-        char courseName[31];
-        while (fscanf(pCoursesFile, "%i %s", &courseId, courseName) != -1){
+        while (fscanf(pCoursesFile, "%i#%*s%*i", &courseId) != -1){
             if (courseId == discipline.courseId){
                 courseExists = true;
             }
@@ -242,7 +241,7 @@ bool recordDiscipline(){
     } while (courseExists == false);
 
     // armazena no arquivo disciplines.txt
-    fprintf(pDisciplineFile, "%i %s %i %i\n", discipline.id, discipline.name, discipline.workTime, discipline.courseId);
+    fprintf(pDisciplineFile, "%i#%s#%i#%i\n", discipline.id, discipline.name, discipline.workTime, discipline.courseId);
     fclose(pDisciplineFile);
     fclose(pCoursesFile);
     return true;
@@ -259,7 +258,7 @@ bool showStudent(){
 
     printf("| Id | Name | Birth Date | Course Id |\n\n");
 
-	while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
+	while (fscanf(pFile, "%i#%s#%s#%i\n", &id, name, birthDate, &courseId) != -1){
         printf("%i %s %s %i\n", id, name, birthDate, courseId);
 	}
 	system("pause");
@@ -277,7 +276,7 @@ bool showCourses(){
 		return false;
 
     printf("| Id | Name | Worktime |\n\n");
-	while (fscanf(pFile, "%i %s %i\n", &id, name, &workTime) != -1){
+	while (fscanf(pFile, "%i#%s#%i\n", &id, name, &workTime) != -1){
         printf("%i %s %i\n", id, name, workTime);
 	}
 	system("pause");
@@ -295,7 +294,7 @@ bool showDisciplines(){
 
     system("cls");
     printf("| Id | Name | Worktime | Course Id |\n\n");
-	while (fscanf(pFile, "%i %s %i %i\n", &id, name, &workTime, &courseId) != -1){
+	while (fscanf(pFile, "%i#%s#%i#%i\n", &id, name, &workTime, &courseId) != -1){
         printf("%i %s %i %i\n", id, name, workTime, courseId);
 	}
 
@@ -329,7 +328,7 @@ bool login(){
 
 	// obs.: %*i ou %*s , faz o programa ignorar a captura do dado
 
-	while (fscanf(pFile, "%i %*s %s %s\n", &typeUser, targetId, targetPassword) != -1){
+	while (fscanf(pFile, "%i#%*s#%s#%s\n", &typeUser, targetId, targetPassword) != -1){
 		if (strcmp(sourceId,targetId)== 0){
 			// achou o Id
 			printf("\nID encontrado!\n");
@@ -373,7 +372,7 @@ bool findStudentByKey(){
 
     bool flag;
     char name[31];
-    while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
+    while (fscanf(pFile, "%i#%s#%s#%i\n", &id, name, birthDate, &courseId) != -1){
         if (id == searchId){
             printf("\nStudent finded!\n\t%i %s %s %i\n\n", id, name, birthDate, courseId);
             system("pause");
