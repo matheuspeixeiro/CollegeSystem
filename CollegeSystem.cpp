@@ -55,9 +55,9 @@ typedef struct tempDiscipline{
 // variaveis globais
 int typeUser;
 
-int sequenceId(char filename[25]){
+int sequenceId(char* filename){
     char file[31];
-    char ext[5] = {".txt"};
+    const char* ext = ".txt";
     strcat(strcpy(file, filename), ext);
 
 	//variavel local
@@ -119,8 +119,11 @@ bool recordUser(int type){
 		gets(user.name);
 	} while(strlen(user.name) == 0);
 
+	char aux[31];
+	strcpy(aux,"sequenceUser");
+
 	// entrada do id
-	user.id = sequenceId("sequenceUser");
+	user.id = sequenceId(aux);
 	printf("\nId = %d", user.id);
 	sleep(1);
 
@@ -134,7 +137,7 @@ bool recordUser(int type){
 	} while(strlen(user.password) == 0);
 
 	// armazenar type, nome, id, password
-	fprintf(pFile, "%i#%s#%i#%s\n", user.type, user.name, user.id, user.password);
+	fprintf(pFile, "%i %s %i %s\n", user.type, user.name, user.id, user.password);
 	fclose(pFile);
 	return true;
 }
@@ -147,7 +150,9 @@ bool recordStudent(){
         return false;
 	STUDENT student;
 
-	student.id = sequenceId("sequenceStudent");
+    char aux[31];
+	strcpy(aux,"sequenceStudent");
+	student.id = sequenceId(aux);
 
 	printf("Enter the name: ");
     fflush(stdin);
@@ -166,7 +171,7 @@ bool recordStudent(){
         scanf("%d", &student.courseId);
         pCoursesFile = fopen("courses.txt", "rb");
         char courseName[31];
-        while (fscanf(pCoursesFile, "%i#%*s#%*i", &courseId) != -1){
+        while (fscanf(pCoursesFile, "%i %*s %*i", &courseId) != -1){
             if (courseId == student.courseId){
                 courseExists = true;
             }
@@ -175,7 +180,7 @@ bool recordStudent(){
     } while (courseExists == false);
 
     fclose(pCoursesFile);
-	fprintf(pFile, "%i#%s#%s#%i\n", student.id, student.name, student.birthDate, student.courseId);
+	fprintf(pFile, "%i %s %s %i\n", student.id, student.name, student.birthDate, student.courseId);
 	fclose(pFile);
     return true;
 }
@@ -189,7 +194,10 @@ bool recordCourse(){
         return false;
 	COURSE course;
 
-	course.id = sequenceId("sequenceCourse");
+	char aux[31];
+	strcpy(aux,"sequenceCourse");
+
+	course.id = sequenceId(aux);
 	printf("Course Id: %d\n\n", course.id);
 
 	printf("Enter the course name: ");
@@ -201,7 +209,7 @@ bool recordCourse(){
     system("pause");
 
     // armazenar id, nome, timeWork
-	fprintf(pFile, "%i#%s#%i\n", course.id, course.name, course.workTime);
+	fprintf(pFile, "%i %s %i\n", course.id, course.name, course.workTime);
 	fclose(pFile);
 	return true;
 }
@@ -213,7 +221,10 @@ bool recordDiscipline(){
         return false;
 	DISCIPLINE discipline;
 
-	discipline.id = sequenceId("sequenceDiscipline");
+    char aux[31];
+    strcpy(aux,"sequenceDiscipline");
+
+	discipline.id = sequenceId(aux);
 	printf("Discipline ID: %i\n\n", discipline.id);
 
 	printf("Enter the discipline name: ");
@@ -232,7 +243,8 @@ bool recordDiscipline(){
         //showCourses();
         scanf("%d", &discipline.courseId);
         pCoursesFile = fopen("courses.txt", "rb");
-        while (fscanf(pCoursesFile, "%i#%*s%*i", &courseId) != -1){
+        char courseName[31];
+        while (fscanf(pCoursesFile, "%i %s", &courseId, courseName) != -1){
             if (courseId == discipline.courseId){
                 courseExists = true;
             }
@@ -241,7 +253,7 @@ bool recordDiscipline(){
     } while (courseExists == false);
 
     // armazena no arquivo disciplines.txt
-    fprintf(pDisciplineFile, "%i#%s#%i#%i\n", discipline.id, discipline.name, discipline.workTime, discipline.courseId);
+    fprintf(pDisciplineFile, "%i %s %i %i\n", discipline.id, discipline.name, discipline.workTime, discipline.courseId);
     fclose(pDisciplineFile);
     fclose(pCoursesFile);
     return true;
@@ -258,7 +270,7 @@ bool showStudent(){
 
     printf("| Id | Name | Birth Date | Course Id |\n\n");
 
-	while (fscanf(pFile, "%i#%s#%s#%i\n", &id, name, birthDate, &courseId) != -1){
+	while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
         printf("%i %s %s %i\n", id, name, birthDate, courseId);
 	}
 	system("pause");
@@ -276,7 +288,7 @@ bool showCourses(){
 		return false;
 
     printf("| Id | Name | Worktime |\n\n");
-	while (fscanf(pFile, "%i#%s#%i\n", &id, name, &workTime) != -1){
+	while (fscanf(pFile, "%i %s %i\n", &id, name, &workTime) != -1){
         printf("%i %s %i\n", id, name, workTime);
 	}
 	system("pause");
@@ -294,7 +306,7 @@ bool showDisciplines(){
 
     system("cls");
     printf("| Id | Name | Worktime | Course Id |\n\n");
-	while (fscanf(pFile, "%i#%s#%i#%i\n", &id, name, &workTime, &courseId) != -1){
+	while (fscanf(pFile, "%i %s %i %i\n", &id, name, &workTime, &courseId) != -1){
         printf("%i %s %i %i\n", id, name, workTime, courseId);
 	}
 
@@ -328,7 +340,7 @@ bool login(){
 
 	// obs.: %*i ou %*s , faz o programa ignorar a captura do dado
 
-	while (fscanf(pFile, "%i#%*s#%s#%s\n", &typeUser, targetId, targetPassword) != -1){
+	while (fscanf(pFile, "%i %*s %s %s\n", &typeUser, targetId, targetPassword) != -1){
 		if (strcmp(sourceId,targetId)== 0){
 			// achou o Id
 			printf("\nID encontrado!\n");
@@ -372,7 +384,7 @@ bool findStudentByKey(){
 
     bool flag;
     char name[31];
-    while (fscanf(pFile, "%i#%s#%s#%i\n", &id, name, birthDate, &courseId) != -1){
+    while (fscanf(pFile, "%i %s %s %i\n", &id, name, birthDate, &courseId) != -1){
         if (id == searchId){
             printf("\nStudent finded!\n\t%i %s %s %i\n\n", id, name, birthDate, courseId);
             system("pause");
@@ -531,11 +543,18 @@ void createFile(char* filename){
 }
 
 int main(){
+    char aux1[31], aux2[31], aux3[31], aux4[31];
+	strcpy(aux1,"users");
+	strcpy(aux2,"students");
+	strcpy(aux3,"courses");
+	strcpy(aux4,"disciplines");
+
     /*Criando arquivos*/
-    createFile("users");
-    createFile("students");
-    createFile("courses");
-    createFile("disciplines");
+    createFile(aux1);
+    createFile(aux2);
+    createFile(aux3);
+    createFile(aux4);
+
 
 	/* VER SE O ARQUIVO DE USUÁRIOS POSSUI CADASTROS */
 	// abre o arquivo que armazena os usuarios em modo leitura binaria
